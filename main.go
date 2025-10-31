@@ -3,16 +3,18 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/rdsarjito/evermos-rakamin/config"
 )
 
 func main() {
-	port := os.Getenv("APP_PORT")
-	if port == "" {
-		port = "8080"
+	// Load configuration
+	if err := config.Load(); err != nil {
+		log.Fatalf("failed to load config: %v", err)
 	}
+
+	cfg := config.Get()
 
 	app := fiber.New()
 
@@ -23,9 +25,9 @@ func main() {
 		})
 	})
 
-	addr := fmt.Sprintf(":%s", port)
-	log.Printf("listening on %s", addr)
+	addr := fmt.Sprintf("%s:%s", cfg.App.Host, cfg.App.Port)
+	log.Printf("server starting on %s", addr)
 	if err := app.Listen(addr); err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to start server: %v", err)
 	}
 }
