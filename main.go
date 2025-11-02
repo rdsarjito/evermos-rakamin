@@ -33,6 +33,7 @@ func main() {
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler()
+	categoryHandler := handlers.NewCategoryHandler()
 
 	// Health check endpoint
 	app.Get("/health", func(c *fiber.Ctx) error {
@@ -63,6 +64,16 @@ func main() {
 		auth.Post("/register", authHandler.Register)
 		auth.Post("/login", authHandler.Login)
 		auth.Get("/profile", middleware.AuthMiddleware(), authHandler.Profile)
+	}
+
+	// Category routes
+	categories := app.Group("/categories")
+	{
+		categories.Get("/", categoryHandler.ListCategories)                    // Public
+		categories.Get("/:id", categoryHandler.GetCategory)                    // Public
+		categories.Post("/", middleware.AuthMiddleware(), categoryHandler.CreateCategory)
+		categories.Put("/:id", middleware.AuthMiddleware(), categoryHandler.UpdateCategory)
+		categories.Delete("/:id", middleware.AuthMiddleware(), categoryHandler.DeleteCategory)
 	}
 
 	addr := fmt.Sprintf("%s:%s", cfg.App.Host, cfg.App.Port)
