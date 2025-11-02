@@ -7,11 +7,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	ErrCategoryNotFound = errors.New("category not found")
-	ErrCategoryExists   = errors.New("category already exists")
-)
-
 // CategoryRepository handles category database operations
 type CategoryRepository struct {
 	db *gorm.DB

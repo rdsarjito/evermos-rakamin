@@ -7,11 +7,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	ErrUserNotFound = errors.New("user not found")
-	ErrUserExists   = errors.New("user already exists")
-)
-
 // UserRepository handles user database operations
 type UserRepository struct {
 	db *gorm.DB

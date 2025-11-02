@@ -34,6 +34,7 @@ func main() {
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler()
 	categoryHandler := handlers.NewCategoryHandler()
+	productHandler := handlers.NewProductHandler()
 
 	// Health check endpoint
 	app.Get("/health", func(c *fiber.Ctx) error {
@@ -74,6 +75,16 @@ func main() {
 		categories.Post("/", middleware.AuthMiddleware(), categoryHandler.CreateCategory)
 		categories.Put("/:id", middleware.AuthMiddleware(), categoryHandler.UpdateCategory)
 		categories.Delete("/:id", middleware.AuthMiddleware(), categoryHandler.DeleteCategory)
+	}
+
+	// Product routes
+	products := app.Group("/products")
+	{
+		products.Get("/", productHandler.ListProducts)                        // Public (with search & filter)
+		products.Get("/:id", productHandler.GetProduct)                        // Public
+		products.Post("/", middleware.AuthMiddleware(), productHandler.CreateProduct)
+		products.Put("/:id", middleware.AuthMiddleware(), productHandler.UpdateProduct)
+		products.Delete("/:id", middleware.AuthMiddleware(), productHandler.DeleteProduct)
 	}
 
 	addr := fmt.Sprintf("%s:%s", cfg.App.Host, cfg.App.Port)
