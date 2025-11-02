@@ -35,6 +35,7 @@ func main() {
 	authHandler := handlers.NewAuthHandler()
 	categoryHandler := handlers.NewCategoryHandler()
 	productHandler := handlers.NewProductHandler()
+	wilayahHandler := handlers.NewWilayahHandler()
 
 	// Health check endpoint
 	app.Get("/health", func(c *fiber.Ctx) error {
@@ -85,6 +86,14 @@ func main() {
 		products.Post("/", middleware.AuthMiddleware(), productHandler.CreateProduct)
 		products.Put("/:id", middleware.AuthMiddleware(), productHandler.UpdateProduct)
 		products.Delete("/:id", middleware.AuthMiddleware(), productHandler.DeleteProduct)
+	}
+
+	// Location/Wilayah routes (API Wilayah Indonesia integration)
+	locations := app.Group("/locations")
+	{
+		locations.Get("/provinces", wilayahHandler.GetProvinces)               // Public
+		locations.Get("/regencies", wilayahHandler.GetRegencies)                // Public (requires province_id query param)
+		locations.Get("/districts", wilayahHandler.GetDistricts)               // Public (requires regency_id query param)
 	}
 
 	addr := fmt.Sprintf("%s:%s", cfg.App.Host, cfg.App.Port)
