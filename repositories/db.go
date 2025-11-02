@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/rdsarjito/evermos-rakamin/config"
+	"github.com/rdsarjito/evermos-rakamin/domain"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -48,8 +49,17 @@ func InitDatabase() error {
 		return fmt.Errorf("failed to ping database: %w", err)
 	}
 
+	// Auto migrate tables
+	if err := db.AutoMigrate(
+		&domain.User{},
+		&domain.Category{},
+		&domain.Product{},
+	); err != nil {
+		return fmt.Errorf("failed to auto migrate: %w", err)
+	}
+
 	DB = db
-	log.Println("database connected successfully")
+	log.Println("database connected and migrated successfully")
 	return nil
 }
 
