@@ -6,6 +6,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rdsarjito/evermos-rakamin/config"
+	"github.com/rdsarjito/evermos-rakamin/handlers"
+	"github.com/rdsarjito/evermos-rakamin/middleware"
 	"github.com/rdsarjito/evermos-rakamin/repositories"
 )
 
@@ -29,6 +31,9 @@ func main() {
 
 	app := fiber.New()
 
+	// Initialize handlers
+	authHandler := handlers.NewAuthHandler()
+
 	// Health check endpoint
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
@@ -51,6 +56,14 @@ func main() {
 			"message": "database connection healthy",
 		})
 	})
+
+	// Auth routes
+	auth := app.Group("/auth")
+	{
+		auth.Post("/register", authHandler.Register)
+		auth.Post("/login", authHandler.Login)
+		auth.Get("/profile", middleware.AuthMiddleware(), authHandler.Profile)
+	}
 
 	addr := fmt.Sprintf("%s:%s", cfg.App.Host, cfg.App.Port)
 	log.Printf("server starting on %s", addr)
